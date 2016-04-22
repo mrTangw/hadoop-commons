@@ -16,10 +16,7 @@
 * limitations under the License.
 */
 
-package org.apache.hadoop.yarn.event;
-
-import org.apache.hadoop.classification.InterfaceAudience.Public;
-import org.apache.hadoop.classification.InterfaceStability.Evolving;
+package event;
 
 /**
  * Interface for handling events of type T
@@ -27,8 +24,7 @@ import org.apache.hadoop.classification.InterfaceStability.Evolving;
  * @param <T> parameterized event of type T
  */
 @SuppressWarnings("rawtypes")
-@Public
-@Evolving
+
 public interface EventHandler<T extends Event> {
 
   void handle(T event);

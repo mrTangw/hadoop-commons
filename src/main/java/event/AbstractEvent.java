@@ -16,16 +16,12 @@
 * limitations under the License.
 */
 
-package org.apache.hadoop.yarn.event;
-
-import org.apache.hadoop.classification.InterfaceAudience.Public;
-import org.apache.hadoop.classification.InterfaceStability.Evolving;
+package event;
 
 /**
  * Parent class of all the events. All events extend this class.
  */
-@Public
-@Evolving
+
 public abstract class AbstractEvent<TYPE extends Enum<TYPE>> 
     implements Event<TYPE> {
 

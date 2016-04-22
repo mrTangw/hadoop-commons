@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.hadoop.yarn.event;
+package event;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +27,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.classification.InterfaceAudience.Public;
-import org.apache.hadoop.classification.InterfaceStability.Evolving;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.service.AbstractService;
 import org.apache.hadoop.util.ShutdownHookManager;
@@ -40,11 +38,10 @@ import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
  * class and a thread pool can be used to dispatch the events.
  */
 @SuppressWarnings("rawtypes")
-@Public
-@Evolving
+
 public class AsyncDispatcher extends AbstractService implements Dispatcher {
 
-  private static final Log LOG = LogFactory.getLog(AsyncDispatcher.class);
+//  private static final Log LOG = LogFactory.getLog(AsyncDispatcher.class);
 
   private final BlockingQueue<Event> eventQueue;
   private volatile boolean stopped = false;

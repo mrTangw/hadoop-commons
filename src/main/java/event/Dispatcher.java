@@ -16,10 +16,7 @@
 * limitations under the License.
 */
 
-package org.apache.hadoop.yarn.event;
-
-import org.apache.hadoop.classification.InterfaceAudience.Public;
-import org.apache.hadoop.classification.InterfaceStability.Evolving;
+package event;
 
 /**
  * Event Dispatcher interface. It dispatches events to registered 
@@ -27,8 +24,7 @@ import org.apache.hadoop.classification.InterfaceStability.Evolving;
  * 
  */
 @SuppressWarnings("rawtypes")
-@Public
-@Evolving
+
 public interface Dispatcher {
 
   // Configuration to make sure dispatcher crashes but doesn't do system-exit in
