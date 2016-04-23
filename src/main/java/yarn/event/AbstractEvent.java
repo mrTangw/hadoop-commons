@@ -16,7 +16,7 @@
 * limitations under the License.
 */
 
-package event;
+package yarn.event;
 
 /**
  * Parent class of all the events. All events extend this class.

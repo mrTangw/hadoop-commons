@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package event;
+package yarn.event;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,13 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.service.AbstractService;
-import org.apache.hadoop.util.ShutdownHookManager;
-import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
+import yarn.exception.YarnRuntimeException;
 
 /**
  * Dispatches {@link Event}s in a separate thread. Currently only single thread
@@ -39,9 +36,9 @@ import org.apache.hadoop.yarn.exceptions.YarnRuntimeException;
  */
 @SuppressWarnings("rawtypes")
 
-public class AsyncDispatcher extends AbstractService implements Dispatcher {
+public class AsyncDispatcher implements Dispatcher {
 
-//  private static final Log LOG = LogFactory.getLog(AsyncDispatcher.class);
+  private static Logger LOG = LoggerFactory.getLogger(AsyncDispatcher.class);
 
   private final BlockingQueue<Event> eventQueue;
   private volatile boolean stopped = false;
@@ -69,14 +66,12 @@ public class AsyncDispatcher extends AbstractService implements Dispatcher {
   }
 
   public AsyncDispatcher(BlockingQueue<Event> eventQueue) {
-    super("Dispatcher");
     this.eventQueue = eventQueue;
     this.eventDispatchers = new HashMap<Class<? extends Enum>, EventHandler>();
   }
 
   Runnable createThread() {
     return new Runnable() {
-      @Override
       public void run() {
         while (!stopped && !Thread.currentThread().isInterrupted()) {
           drained = eventQueue.isEmpty();
@@ -107,18 +102,12 @@ public class AsyncDispatcher extends AbstractService implements Dispatcher {
     };
   }
 
-  @Override
-  protected void serviceInit(Configuration conf) throws Exception {
-    this.exitOnDispatchException =
-        conf.getBoolean(Dispatcher.DISPATCHER_EXIT_ON_ERROR_KEY,
-          Dispatcher.DEFAULT_DISPATCHER_EXIT_ON_ERROR);
-    super.serviceInit(conf);
+  protected void serviceInit() throws Exception {
+
   }
 
-  @Override
   protected void serviceStart() throws Exception {
     //start all the components
-    super.serviceStart();
     eventHandlingThread = new Thread(createThread());
     eventHandlingThread.setName("AsyncDispatcher event handler");
     eventHandlingThread.start();
@@ -128,7 +117,6 @@ public class AsyncDispatcher extends AbstractService implements Dispatcher {
     drainEventsOnStop = true;
   }
 
-  @Override
   protected void serviceStop() throws Exception {
     if (drainEventsOnStop) {
       blockNewEvents = true;
@@ -149,9 +137,6 @@ public class AsyncDispatcher extends AbstractService implements Dispatcher {
         LOG.warn("Interrupted Exception while stopping", ie);
       }
     }
-
-    // stop all the components
-    super.serviceStop();
   }
 
   @SuppressWarnings("unchecked")
@@ -173,11 +158,9 @@ public class AsyncDispatcher extends AbstractService implements Dispatcher {
       }
     } catch (Throwable t) {
       //TODO Maybe log the state of the queue
-      LOG.fatal("Error in dispatcher thread", t);
+      LOG.error("Error in dispatcher thread", t);
       // If serviceStop is called, we should exit this thread gracefully.
-      if (exitOnDispatchException
-          && (ShutdownHookManager.get().isShutdownInProgress()) == false
-          && stopped == false) {
+      if (exitOnDispatchException && stopped == false) {
         LOG.info("Exiting, bbye..");
         System.exit(-1);
       }
@@ -185,7 +168,6 @@ public class AsyncDispatcher extends AbstractService implements Dispatcher {
   }
 
   @SuppressWarnings("unchecked")
-  @Override
   public void register(Class<? extends Enum> eventType,
       EventHandler handler) {
     /* check to see if we have a listener registered */
@@ -208,7 +190,6 @@ public class AsyncDispatcher extends AbstractService implements Dispatcher {
     }
   }
 
-  @Override
   public EventHandler getEventHandler() {
     if (handlerInstance == null) {
       handlerInstance = new GenericEventHandler();
@@ -256,7 +237,6 @@ public class AsyncDispatcher extends AbstractService implements Dispatcher {
       listofHandlers = new ArrayList<EventHandler<Event>>();
     }
 
-    @Override
     public void handle(Event event) {
       for (EventHandler<Event> handler: listofHandlers) {
         handler.handle(event);

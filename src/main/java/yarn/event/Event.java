@@ -16,17 +16,16 @@
 * limitations under the License.
 */
 
-package event;
+package yarn.event;
 
 /**
- * Interface for handling events of type T
+ * Interface defining events api.
  *
- * @param <T> parameterized event of type T
  */
-@SuppressWarnings("rawtypes")
 
-public interface EventHandler<T extends Event> {
+public interface Event<TYPE extends Enum<TYPE>> {
 
-  void handle(T event);
-
+  TYPE getType();
+  long getTimestamp();
+  String toString();
 }
